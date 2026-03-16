@@ -4,11 +4,13 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const CATEGORIES = ['Ai Visual', 'Editting & Visual FX', 'Color Granding', 'Shooting Production', 'Etc']
+const ADMIN_EMAIL = 'chiengdirector@gmail.com'
 
 export default function Home() {
   const supabase = createClient()
   const router = useRouter()
   const [user, setUser] = useState(null)
+  const isAdmin = user?.email === ADMIN_EMAIL
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -114,15 +116,17 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-gray-800">Visual Technic</h1>
             <p className="text-gray-500 text-sm mt-1">{posts.length} เทคนิคทั้งหมด</p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <span>+</span> เพิ่มเทคนิค
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <span>+</span> เพิ่มเทคนิค
+            </button>
+          )}
         </div>
 
-        {showForm && (
+        {showForm && isAdmin && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="font-semibold text-gray-800 mb-4">เพิ่มเทคนิคใหม่</h2>
             <form onSubmit={addPost} className="space-y-4">
