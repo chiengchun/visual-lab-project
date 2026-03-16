@@ -13,6 +13,8 @@ function getYouTubeId(url) {
   } catch { return null }
 }
 
+function cn(...classes) { return classes.filter(Boolean).join(' ') }
+
 export default function Home() {
   const supabase = createClient()
   const [user, setUser] = useState(null)
@@ -81,6 +83,10 @@ export default function Home() {
     fetchComments(post.id)
   }
 
+  function handleLogin() {
+    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + '/auth/callback' } })
+  }
+
   const filteredPosts = activeCategory === 'All' ? posts : posts.filter(p => p.category === activeCategory)
 
   return (
@@ -97,7 +103,7 @@ export default function Home() {
             <button onClick={() => supabase.auth.signOut()} className="text-sm text-gray-400 hover:text-white">ออกจากระบบ</button>
           </div>
         ) : (
-          <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: \`\${location.origin}/auth/callback\` } })} className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium">เข้าสู่ระบบ</button>
+          <button onClick={handleLogin} className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium">เข้าสู่ระบบ</button>
         )}
       </header>
 
@@ -108,7 +114,7 @@ export default function Home() {
             <p className="text-gray-500 text-sm mt-1">{filteredPosts.length} เทคนิคทั้งหมด</p>
           </div>
           {isAdmin && (
-            <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+            <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700">
               <span>+</span> เพิ่มเทคนิค
             </button>
           )}
@@ -117,7 +123,7 @@ export default function Home() {
         <div className="flex gap-2 flex-wrap mb-6">
           {['All', ...CATEGORIES].map(cat => (
             <button key={cat} onClick={() => setActiveCategory(cat)}
-              className={\`px-4 py-2 rounded-full text-sm font-medium transition-colors \${activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300'}\`}>
+              className={cn('px-4 py-2 rounded-full text-sm font-medium transition-colors', activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300')}>
               {cat}
             </button>
           ))}
@@ -127,19 +133,19 @@ export default function Home() {
           <form onSubmit={addPost} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="font-semibold text-gray-900 mb-4">เพิ่มเทคนิคใหม่</h2>
             <div className="space-y-3">
-              <input required placeholder="ชื่อเทคนิค" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <textarea required placeholder="สรุปเนื้อหาภาษาไทย" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input required placeholder="ชื่อเทคนิค" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+              <textarea required placeholder="สรุปเนื้อหาภาษาไทย" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
               <div className="flex gap-3">
                 <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm">
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
-                <input placeholder="Platform (YouTube, IG...)" value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input placeholder="Platform (YouTube, IG...)" value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm" />
               </div>
-              <input placeholder="Link URL" value={form.url} onChange={e => setForm({...form, url: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input placeholder="Link URL" value={form.url} onChange={e => setForm({...form, url: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
             </div>
             <div className="flex gap-2 mt-4">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">บันทึก</button>
-              <button type="button" onClick={() => setShowForm(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">ยกเลิก</button>
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">บันทึก</button>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">ยกเลิก</button>
             </div>
           </form>
         )}
@@ -157,7 +163,7 @@ export default function Home() {
               const ytId = getYouTubeId(post.url)
               const coverImage = (post.image_urls && post.image_urls.length > 0)
                 ? post.image_urls[0]
-                : (ytId ? \`https://img.youtube.com/vi/\${ytId}/hqdefault.jpg\` : null)
+                : (ytId ? 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg' : null)
               return (
                 <div key={post.id} onClick={() => openPost(post)} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5">
                   {coverImage && (
@@ -191,18 +197,14 @@ export default function Home() {
             {selectedPost.image_urls && selectedPost.image_urls.length > 0 && (
               <div className="flex gap-2 overflow-x-auto p-4 bg-gray-50 rounded-t-2xl">
                 {selectedPost.image_urls.map((url, i) => (
-                  <img key={i} src={url} alt={\`frame \${i+1}\`} className="h-52 w-auto rounded-xl flex-shrink-0 object-cover shadow-sm" />
+                  <img key={i} src={url} alt={'frame ' + (i+1)} className="h-52 w-auto rounded-xl flex-shrink-0 object-cover shadow-sm" />
                 ))}
               </div>
             )}
 
-            {!selectedPost.image_urls?.length && getYouTubeId(selectedPost.url) && (
+            {(!selectedPost.image_urls || !selectedPost.image_urls.length) && getYouTubeId(selectedPost.url) && (
               <div className="bg-black rounded-t-2xl overflow-hidden">
-                <iframe
-                  src={\`https://www.youtube.com/embed/\${getYouTubeId(selectedPost.url)}\`}
-                  className="w-full aspect-video"
-                  allowFullScreen
-                />
+                <iframe src={'https://www.youtube.com/embed/' + getYouTubeId(selectedPost.url)} className="w-full aspect-video" allowFullScreen />
               </div>
             )}
 
@@ -214,8 +216,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-gray-900 mb-3">{selectedPost.title}</h2>
               <p className="text-gray-700 text-sm leading-relaxed mb-4 whitespace-pre-line">{selectedPost.description}</p>
               {selectedPost.url && (
-                <a href={selectedPost.url} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 text-sm hover:underline bg-blue-50 px-3 py-2 rounded-lg mb-4">
+                <a href={selectedPost.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 text-sm hover:underline bg-blue-50 px-3 py-2 rounded-lg mb-4">
                   🔗 ดูต้นฉบับ
                 </a>
               )}
@@ -238,11 +239,11 @@ export default function Home() {
               </div>
               {user ? (
                 <div className="flex gap-2">
-                  <input value={newComment} onChange={e => setNewComment(e.target.value)} onKeyDown={e => e.key === 'Enter' && addComment()} placeholder="แสดงความคิดเห็น..." className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  <button onClick={addComment} className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700">ส่ง</button>
+                  <input value={newComment} onChange={e => setNewComment(e.target.value)} onKeyDown={e => e.key === 'Enter' && addComment()} placeholder="แสดงความคิดเห็น..." className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm" />
+                  <button onClick={addComment} className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm">ส่ง</button>
                 </div>
               ) : (
-                <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: \`\${location.origin}/auth/callback\` } })} className="w-full text-center text-gray-500 text-sm py-2 border border-dashed border-gray-200 rounded-xl hover:bg-gray-50">
+                <button onClick={handleLogin} className="w-full text-center text-gray-500 text-sm py-2 border border-dashed border-gray-200 rounded-xl hover:bg-gray-50">
                   เข้าสู่ระบบเพื่อแสดงความคิดเห็น
                 </button>
               )}
