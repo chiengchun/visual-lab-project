@@ -1,278 +1,251 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 
 const CATEGORIES = ['Ai Visual', 'Editting & Visual FX', 'Color Granding', 'Shooting Production', 'Etc']
 const ADMIN_EMAIL = 'chiengdirector@gmail.com'
 
+function getYouTubeId(url) {
+  if (!url) return null
+  try {
+    const u = new URL(url)
+    return u.searchParams.get('v') || u.pathname.split('/').pop()
+  } catch { return null }
+}
+
 export default function Home() {
   const supabase = createClient()
-  const router = useRouter()
   const [user, setUser] = useState(null)
-  const isAdmin = user?.email === ADMIN_EMAIL
   const [posts, setPosts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [activeCategory, setActiveCategory] = useState('All')
   const [showForm, setShowForm] = useState(false)
   const [selectedPost, setSelectedPost] = useState(null)
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
-  const [form, setForm] = useState({ title: '', content: '', platform: 'Ai Visual', youtube_url: '' })
-  const [filter, setFilter] = useState('All')
-  const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [form, setForm] = useState({ title: '', description: '', platform: '', url: '', category: CATEGORIES[0] })
+
+  const isAdmin = user?.email === ADMIN_EMAIL
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.push('/login'); return }
-      setUser(user)
-      loadPosts()
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
     })
+    fetchPosts()
+    return () => subscription.unsubscribe()
   }, [])
 
-  async function loadPosts() {
+  async function fetchPosts() {
+    setLoading(true)
     const { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false })
     setPosts(data || [])
     setLoading(false)
   }
 
-  async function loadComments(postId) {
+  async function fetchComments(postId) {
     const { data } = await supabase.from('comments').select('*').eq('post_id', postId).order('created_at', { ascending: true })
     setComments(data || [])
   }
 
-  async function signOut() {
-    await supabase.auth.signOut()
-    router.push('/login')
+  async function addComment() {
+    if (!newComment.trim() || !user) return
+    await supabase.from('comments').insert({
+      post_id: selectedPost.id,
+      author_name: user.user_metadata?.full_name,
+      author_email: user.email,
+      author_avatar: user.user_metadata?.avatar_url,
+      content: newComment
+    })
+    setNewComment('')
+    fetchComments(selectedPost.id)
   }
 
   async function addPost(e) {
     e.preventDefault()
-    if (!form.title.trim() || !form.content.trim()) return
-    setSubmitting(true)
+    if (!isAdmin) return
     await supabase.from('posts').insert({
-      title: form.title,
-      content: form.content,
-      platform: form.platform,
-      youtube_url: form.youtube_url,
-      added_by_name: user.user_metadata?.full_name || user.email,
+      ...form,
+      added_by_name: user.user_metadata?.full_name,
       added_by_email: user.email,
-      added_by_avatar: user.user_metadata?.avatar_url || '',
-      category: form.platform,
+      added_by_avatar: user.user_metadata?.avatar_url,
+      image_urls: []
     })
-    setForm({ title: '', content: '', platform: 'Premiere Pro', youtube_url: '' })
+    setForm({ title: '', description: '', platform: '', url: '', category: CATEGORIES[0] })
     setShowForm(false)
-    setSubmitting(false)
-    loadPosts()
-  }
-
-  async function addComment(e) {
-    e.preventDefault()
-    if (!newComment.trim()) return
-    await supabase.from('comments').insert({
-      post_id: selectedPost.id,
-      author_name: user.user_metadata?.full_name || user.email,
-      author_email: user.email,
-      author_avatar: user.user_metadata?.avatar_url || '',
-      content: newComment,
-    })
-    setNewComment('')
-    loadComments(selectedPost.id)
+    fetchPosts()
   }
 
   function openPost(post) {
     setSelectedPost(post)
-    loadComments(post.id)
+    fetchComments(post.id)
   }
 
-  const filtered = filter === 'All' ? posts : posts.filter(p => p.platform === filter)
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-gray-400 text-lg">กำลังโหลด...</div>
-    </div>
-  )
+  const filteredPosts = activeCategory === 'All' ? posts : posts.filter(p => p.category === activeCategory)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+      <header className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🎬</span>
+          <span>🎬</span>
           <span className="font-bold text-lg">Visual Lab</span>
         </div>
-        <div className="flex items-center gap-3">
-          {user?.user_metadata?.avatar_url && (
-            <img src={user.user_metadata.avatar_url} className="w-8 h-8 rounded-full" alt="avatar" />
-          )}
-          <span className="text-sm text-gray-300">{user?.user_metadata?.full_name || user?.email}</span>
-          <button onClick={signOut} className="text-sm text-gray-400 hover:text-white transition-colors ml-2">
-            ออกจากระบบ
-          </button>
-        </div>
-      </nav>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <img src={user.user_metadata?.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+            <span className="text-sm hidden sm:block">{user.user_metadata?.full_name}</span>
+            <button onClick={() => supabase.auth.signOut()} className="text-sm text-gray-400 hover:text-white">ออกจากระบบ</button>
+          </div>
+        ) : (
+          <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: \`\${location.origin}/auth/callback\` } })} className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium">เข้าสู่ระบบ</button>
+        )}
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex items-start justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Visual Technic</h1>
-            <p className="text-gray-500 text-sm mt-1">{posts.length} เทคนิคทั้งหมด</p>
+            <h1 className="text-2xl font-bold text-gray-900">Visual Technic</h1>
+            <p className="text-gray-500 text-sm mt-1">{filteredPosts.length} เทคนิคทั้งหมด</p>
           </div>
           {isAdmin && (
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
+            <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
               <span>+</span> เพิ่มเทคนิค
             </button>
           )}
         </div>
 
-        {showForm && isAdmin && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 className="font-semibold text-gray-800 mb-4">เพิ่มเทคนิคใหม่</h2>
-            <form onSubmit={addPost} className="space-y-4">
-              <input
-                type="text"
-                placeholder="ชื่อเทคนิค เช่น วิธีทำ Color Grade สไตล์ Cinema"
-                value={form.title}
-                onChange={e => setForm({ ...form, title: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400"
-                required
-              />
-              <textarea
-                placeholder="อธิบายขั้นตอน วิธีใช้ หรือ tips ที่มีประโยชน์..."
-                value={form.content}
-                onChange={e => setForm({ ...form, content: e.target.value })}
-                rows={4}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"
-                required
-              />
-              <div className="flex gap-3">
-                <select
-                  value={form.platform}
-                  onChange={e => setForm({ ...form, platform: e.target.value })}
-                  className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 bg-white"
-                >
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-                <input
-                  type="url"
-                  placeholder="YouTube URL (ถ้ามี)"
-                  value={form.youtube_url}
-                  onChange={e => setForm({ ...form, youtube_url: e.target.value })}
-                  className="flex-2 w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400"
-                />
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button type="submit" disabled={submitting} className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50">
-                  {submitting ? 'กำลังบันทึก...' : 'บันทึก'}
-                </button>
-                <button type="button" onClick={() => setShowForm(false)} className="text-gray-500 px-6 py-2.5 rounded-xl hover:bg-gray-100 transition-colors">
-                  ยกเลิก
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        <div className="flex gap-2 mb-5 flex-wrap">
+        <div className="flex gap-2 flex-wrap mb-6">
           {['All', ...CATEGORIES].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
-              }`}
-            >
+            <button key={cat} onClick={() => setActiveCategory(cat)}
+              className={\`px-4 py-2 rounded-full text-sm font-medium transition-colors \${activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300'}\`}>
               {cat}
             </button>
           ))}
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <div className="text-5xl mb-3">📭</div>
-            <p>ยังไม่มีเทคนิคในหมวดนี้ เพิ่มอันแรกได้เลย!</p>
+        {showForm && isAdmin && (
+          <form onSubmit={addPost} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 className="font-semibold text-gray-900 mb-4">เพิ่มเทคนิคใหม่</h2>
+            <div className="space-y-3">
+              <input required placeholder="ชื่อเทคนิค" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <textarea required placeholder="สรุปเนื้อหาภาษาไทย" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <div className="flex gap-3">
+                <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+                <input placeholder="Platform (YouTube, IG...)" value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <input placeholder="Link URL" value={form.url} onChange={e => setForm({...form, url: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">บันทึก</button>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">ยกเลิก</button>
+            </div>
+          </form>
+        )}
+
+        {loading ? (
+          <div className="text-center py-20 text-gray-400">กำลังโหลด...</div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-4xl mb-3">📬</div>
+            <p className="text-gray-400">ยังไม่มีเทคนิคในหมวดนี้ เพิ่มอันแรกได้เลย!</p>
           </div>
         ) : (
-          <div className="grid gap-4">
-            {filtered.map(post => (
-              <div
-                key={post.id}
-                onClick={() => openPost(post)}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-medium bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">{post.platform}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPosts.map(post => {
+              const ytId = getYouTubeId(post.url)
+              const coverImage = (post.image_urls && post.image_urls.length > 0)
+                ? post.image_urls[0]
+                : (ytId ? \`https://img.youtube.com/vi/\${ytId}/hqdefault.jpg\` : null)
+              return (
+                <div key={post.id} onClick={() => openPost(post)} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5">
+                  {coverImage && (
+                    <div className="h-44 bg-gray-100 overflow-hidden">
+                      <img src={coverImage} alt={post.title} className="w-full h-full object-cover" onError={e => { e.target.parentElement.style.display='none' }} />
                     </div>
-                    <h2 className="font-semibold text-gray-800 text-base leading-snug">{post.title}</h2>
-                    <p className="text-gray-500 text-sm mt-2 line-clamp-2">{post.content}</p>
-                  </div>
-                  {post.added_by_avatar && (
-                    <img src={post.added_by_avatar} className="w-9 h-9 rounded-full flex-shrink-0" alt="" />
                   )}
+                  <div className="p-4">
+                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">{post.category}</span>
+                    <h3 className="font-semibold text-gray-900 mt-2 text-sm leading-snug line-clamp-2">{post.title}</h3>
+                    <p className="text-gray-500 text-xs mt-1 line-clamp-2">{post.description}</p>
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
+                      {post.added_by_avatar && <img src={post.added_by_avatar} alt="" className="w-5 h-5 rounded-full" />}
+                      <span className="text-xs text-gray-400 flex-1">{post.added_by_name}</span>
+                      {post.image_urls && post.image_urls.length > 0 && <span className="text-xs text-gray-400">🖼 {post.image_urls.length}</span>}
+                      {post.platform && <span className="text-xs text-gray-400">{post.platform}</span>}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
-                  <span className="text-xs text-gray-400">โดย {post.added_by_name}</span>
-                  <span className="text-xs text-gray-400">{new Date(post.created_at).toLocaleDateString('th-TH')}</span>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
-      </div>
+      </main>
 
       {selectedPost && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4" onClick={() => setSelectedPost(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex justify-between items-start">
-                <span className="text-xs font-medium bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">{selectedPost.platform}</span>
-                <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPost(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setSelectedPost(null)} className="absolute top-4 right-4 z-10 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-gray-900">✕</button>
+
+            {selectedPost.image_urls && selectedPost.image_urls.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto p-4 bg-gray-50 rounded-t-2xl">
+                {selectedPost.image_urls.map((url, i) => (
+                  <img key={i} src={url} alt={\`frame \${i+1}\`} className="h-52 w-auto rounded-xl flex-shrink-0 object-cover shadow-sm" />
+                ))}
               </div>
-              <h2 className="text-xl font-bold text-gray-800 mt-3">{selectedPost.title}</h2>
-              <p className="text-gray-600 mt-3 leading-relaxed whitespace-pre-wrap">{selectedPost.content}</p>
-              {selectedPost.youtube_url && (
-                <a href={selectedPost.youtube_url} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-4 text-red-600 text-sm font-medium hover:underline">
-                  ▶ ดูวิดีโอ YouTube
-                </a>
-              )}
-              <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                {selectedPost.added_by_avatar && (
-                  <img src={selectedPost.added_by_avatar} className="w-7 h-7 rounded-full" alt="" />
-                )}
-                <span className="text-sm text-gray-500">เพิ่มโดย {selectedPost.added_by_name}</span>
-                <span className="text-sm text-gray-400 ml-auto">{new Date(selectedPost.created_at).toLocaleDateString('th-TH')}</span>
+            )}
+
+            {!selectedPost.image_urls?.length && getYouTubeId(selectedPost.url) && (
+              <div className="bg-black rounded-t-2xl overflow-hidden">
+                <iframe
+                  src={\`https://www.youtube.com/embed/\${getYouTubeId(selectedPost.url)}\`}
+                  className="w-full aspect-video"
+                  allowFullScreen
+                />
               </div>
-            </div>
+            )}
 
             <div className="p-6">
-              <h3 className="font-semibold text-gray-700 mb-4">💬 ความคิดเห็น ({comments.length})</h3>
-              <div className="space-y-3 mb-5">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">{selectedPost.category}</span>
+                {selectedPost.platform && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{selectedPost.platform}</span>}
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">{selectedPost.title}</h2>
+              <p className="text-gray-700 text-sm leading-relaxed mb-4 whitespace-pre-line">{selectedPost.description}</p>
+              {selectedPost.url && (
+                <a href={selectedPost.url} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-blue-600 text-sm hover:underline bg-blue-50 px-3 py-2 rounded-lg mb-4">
+                  🔗 ดูต้นฉบับ
+                </a>
+              )}
+              <div className="flex items-center gap-2 py-3 border-t border-b border-gray-100 mb-4">
+                {selectedPost.added_by_avatar && <img src={selectedPost.added_by_avatar} alt="" className="w-6 h-6 rounded-full" />}
+                <span className="text-xs text-gray-500">เพิ่มโดย {selectedPost.added_by_name}</span>
+              </div>
+
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">ความคิดเห็น ({comments.length})</h3>
+              <div className="space-y-3 mb-4">
                 {comments.map(c => (
-                  <div key={c.id} className="flex gap-3">
-                    {c.author_avatar && <img src={c.author_avatar} className="w-7 h-7 rounded-full flex-shrink-0 mt-0.5" alt="" />}
-                    <div className="bg-gray-50 rounded-xl px-4 py-3 flex-1">
-                      <span className="text-xs font-medium text-gray-700">{c.author_name}</span>
-                      <p className="text-sm text-gray-600 mt-1">{c.content}</p>
+                  <div key={c.id} className="flex gap-2">
+                    {c.author_avatar && <img src={c.author_avatar} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />}
+                    <div className="bg-gray-50 rounded-xl px-3 py-2 flex-1">
+                      <p className="text-xs font-medium text-gray-700">{c.author_name}</p>
+                      <p className="text-sm text-gray-600 mt-0.5">{c.content}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <form onSubmit={addComment} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="เขียนความคิดเห็น..."
-                  value={newComment}
-                  onChange={e => setNewComment(e.target.value)}
-                  className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
-                />
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors">
-                  ส่ง
+              {user ? (
+                <div className="flex gap-2">
+                  <input value={newComment} onChange={e => setNewComment(e.target.value)} onKeyDown={e => e.key === 'Enter' && addComment()} placeholder="แสดงความคิดเห็น..." className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <button onClick={addComment} className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700">ส่ง</button>
+                </div>
+              ) : (
+                <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: \`\${location.origin}/auth/callback\` } })} className="w-full text-center text-gray-500 text-sm py-2 border border-dashed border-gray-200 rounded-xl hover:bg-gray-50">
+                  เข้าสู่ระบบเพื่อแสดงความคิดเห็น
                 </button>
-              </form>
+              )}
             </div>
           </div>
         </div>
