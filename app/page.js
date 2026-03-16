@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
-const CATEGORIES = ['Premiere Pro', 'DaVinci Resolve', 'After Effects', 'CapCut', 'Final Cut', 'อื่นๆ']
+const CATEGORIES = ['Ai Visual', 'Editting & Visual FX', 'Color Granding', 'Shooting Production', 'Etc']
 
 export default function Home() {
   const supabase = createClient()
@@ -15,8 +15,8 @@ export default function Home() {
   const [selectedPost, setSelectedPost] = useState(null)
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
-  const [form, setForm] = useState({ title: '', content: '', platform: 'Premiere Pro', youtube_url: '' })
-  const [filter, setFilter] = useState('ทั้งหมด')
+  const [form, setForm] = useState({ title: '', content: '', platform: 'Ai Visual', youtube_url: '' })
+  const [filter, setFilter] = useState('All')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function Home() {
     loadComments(post.id)
   }
 
-  const filtered = filter === 'ทั้งหมด' ? posts : posts.filter(p => p.platform === filter)
+  const filtered = filter === 'All' ? posts : posts.filter(p => p.platform === filter)
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -171,7 +171,7 @@ export default function Home() {
         )}
 
         <div className="flex gap-2 mb-5 flex-wrap">
-          {['ทั้งหมด', ...CATEGORIES].map(cat => (
+          {['All', ...CATEGORIES].map(cat => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
