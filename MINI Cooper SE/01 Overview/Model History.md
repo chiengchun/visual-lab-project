@@ -18,7 +18,7 @@ MINI Cooper SE เป็นรถยนต์ไฟฟ้าล้วน (BEV) �
 - แบตเตอรี่ Li-ion 32.6 kWh (ใช้งานจริง ~28.9 kWh) วางรูปตัว T ใต้พื้นรถ จุดศูนย์ถ่วงต่ำกว่ารุ่นเบนซิน
 - 0–100 กม./ชม. 7.3 วินาที · ความเร็วสูงสุดจำกัดที่ 150 กม./ชม. · น้ำหนักตัวถัง ~1,365 กก.
 - ระยะทาง WLTP ประมาณ 203–234 กม. (ขึ้นกับล้อ/สเปก)
-- ประเทศไทย: เปิดตัวประมาณปี 2020 นำเข้าทั้งคัน (CBU) จากอังกฤษ ราคาเปิดตัวประมาณ 2.29 ล้านบาท *(ต้องยืนยันตัวเลขทางการ)*
+- ประเทศไทย: ✅ เปิดตัว 6 ก.พ. 2020 (ประเทศแรกในเอเชียแปซิฟิก) pre-order 14 ก.พ. 2020 ราคา **2,290,000 บาท** นำเข้า CBU จาก Oxford รวม MSI Standard 3 ปี/60,000 กม.
 - ยุติการผลิตต้นปี 2024 พร้อมการเปลี่ยนผ่านสู่เจนใหม่ J01 (Cooper E/SE ไฟฟ้า ผลิตที่จีน)
 
 ## Timeline โดยย่อ
@@ -45,7 +45,9 @@ timeline
 
 ## References
 
-- MINI / BMW Group press release เปิดตัว Cooper SE (2019) — *ต้องเก็บลิงก์เข้า [[09 Resources]]*
+- [เปิดตัว MINI Electric ในไทย 2.29 ล้านบาท — MINI-TH.com (6 ก.พ. 2020)](https://mini-th.com/2020/02/06/mini-thailand-launch-mini-cooper-se-electric/)
+- [Thairath — MINI เปิดตัวรถไฟฟ้า NEW COOPER SE ในไทย](https://www.thairath.co.th/news/auto/news/1766926)
+- [ราคาทางการ SE LCI ไทย 2.29 ล้านบาท — Headlightmag (22 มิ.ย. 2021)](https://www.headlightmag.com/official-price-mini-cooper-se-lci/)
 - ข้อมูลสเปกทางการ MINI Thailand — *รอเอกสาร brochure ใน Inbox*
 
 ## Related Notes
