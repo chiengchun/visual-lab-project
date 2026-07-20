@@ -8,11 +8,11 @@ updated: 2026-07-20
 
 ## Summary
 
-Cooper SE รองรับ AC สูงสุด 11 kW (Type 2) และ DC สูงสุด 50 kW (CCS2) การใช้งานจริงในไทย: ชาร์จที่บ้านด้วย wallbox คือโหมดหลัก (เต็มภายในคืนเดียว) ส่วน DC ใช้เฉพาะเดินทางไกล ระยะทางจริงต่อชาร์จประมาณ 160–200 กม. ขึ้นกับความเร็วและแอร์
+Cooper SE รองรับ AC สูงสุด 11 kW (Type 2, 3 เฟส) และ DC สูงสุด 50 kW (CCS2) การใช้งานจริงในไทย: ชาร์จที่บ้านด้วย wallbox คือโหมดหลัก (เต็มภายในคืนเดียว) ส่วน DC ใช้เฉพาะเดินทางไกล ระยะทางจริงต่อชาร์จ **~160–185 กม.** (เจ้าของต่างประเทศรายงาน ~100–115 ไมล์ = 160–185 กม. บนไฮเวย์ ขึ้นกับความเร็ว/แอร์) — WLTP ~203–234 กม. เป็นตัวเลขในอุดมคติ ใช้งานจริงในเมืองร้อนที่เปิดแอร์ตลอดจะได้ต่ำกว่านั้น
 
 ## Key Points
 
-- **AC (Type 2):** สูงสุด 11 kW (3 เฟส) — 0→100% ~2.5–3.5 ชม. / ถ้าไฟบ้าน 1 เฟสผ่าน wallbox 7.4 kW ไม่ได้ — รถรับ 1 เฟสได้สูงสุด ~4.6 kW *(ยืนยันข้อจำกัด 1 เฟสกับสเปกไทย)* → เต็มใน ~6–7 ชม.
+- ✅ **AC (Type 2):** สูงสุด **11 kW (3 เฟส)** — 0→80% ~2.5 ชม. (on-board charger 11 kW) · ต่อกับตู้ 22 kW ก็รับได้แค่ 11 kW · ไฟบ้าน 1 เฟสรับได้สูงสุด ~4.6 kW → เต็ม ~6–7 ชม. *(ยืนยัน 11 kW 3 เฟสจากสเปกโรงงาน; ข้อจำกัด 1 เฟสของไฟบ้านไทยยังต้องเช็คหน้างาน)*
 - **DC (CCS2):** สูงสุด 50 kW — 0→80% ~35 นาที เหมาะกับการแวะระหว่างทาง
 - **ชาร์จบ้านผ่านปลั๊กธรรมดา (Mode 2):** ~2.3 kW ใช้เวลา ~12 ชม. — ใช้ฉุกเฉิน ไม่แนะนำประจำ
 - **หัวชาร์จ:** Type 2 (AC) + CCS Combo 2 (DC) — มาตรฐานเดียวกับ EV ยุโรปในไทย ใช้เครือข่าย PTT EV Station, EA Anywhere, Elex, PEA Volta ได้หมด
@@ -41,7 +41,9 @@ Cooper SE รองรับ AC สูงสุด 11 kW (Type 2) และ DC �
 
 ## References
 
-- สเปกชาร์จทางการ MINI — *รอ brochure*
+- [MINI Cooper SE Charging Guide (AC 11 kW 3-phase, DC 50 kW) — zecar](https://zecar.com/ev-charging-guides/mini/cooper-se/2021/mini-cooper-se)
+- [Fastned: Cooper SE accepts up to 50 kW DC — InsideEVs](https://insideevs.com/news/426164/fastned-mini-cooper-se-dc-charging-power/)
+- [Cooper SE real-world range test — ArenaEV](https://www.arenaev.com/mini_cooper_se_real_world_range_test-news-3943.php)
 - อัตราค่าไฟ TOU กฟน./กฟภ. — *อัปเดตปีละครั้ง*
 
 ## Related Notes

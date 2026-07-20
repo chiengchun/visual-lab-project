@@ -36,13 +36,30 @@ SOH (State of Health) คือเปอร์เซ็นต์ความจ�
 
 ## บันทึกค่า SOH ที่พบในตลาด (สะสมข้อมูล)
 
+### ข้อมูลเจ้าของต่างประเทศ (จาก forum/OBD — อ้างอิงเทียบเคียง)
+
+| รถ (ปี/ไมล์) | SOH / การเสื่อม | แหล่งตรวจ | หมายเหตุ |
+| --- | --- | --- | --- |
+| 2021, ~21,000 ไมล์ (4 ปีถือครอง) | เสื่อม ~4% (SOH ~96%) | OBD Bluetooth dongle | ระยะทางจริงยังไม่ลดที่วัดได้ |
+| 2022 (ม.ค.), ~42,000 ไมล์ | SOH ~94–96% (แกว่งตามอากาศ/การชาร์จล่าสุด) | — | ชาร์จถึง ~75% เป็นประจำ |
+| กลุ่มรถ 2020–2021, 20,000–30,000 ไมล์ | SOH 96–98% | รวมจากหลายเจ้าของ | รถ 3–4 ปีเสื่อมหลัก single digit |
+| กลุ่มรถ 30,000–35,000 ไมล์ climate ผสม | ความจุลด ~2–5% | รวมจากหลายเจ้าของ | ยังใกล้ความจุเดิม |
+
+> [!note] อ่านค่าอย่างไร
+> SOH กลาง 90 ปลาย ๆ ที่รถอายุ 3–5 ปี = สัญญาณดี · แพลตฟอร์มนี้ (ฐาน i3) เสื่อมช้าเมื่อชาร์จอย่างระวังและไม่ DC บ่อย · **ยังไม่มี data point ของรถไทยโดยตรง — ตัวเลขข้างบนเป็นฐานเทียบ ต้องเก็บของรถไทยเพิ่ม**
+
+### ข้อมูลรถไทย (เก็บเมื่อไปดูรถจริง)
+
 | วันที่ | รถ (ปี/ไมล์) | SOH | แหล่งตรวจ | หมายเหตุ |
 | --- | --- | --- | --- | --- |
 | *รอข้อมูล* | | | | |
 
 ## References
 
-- กระทู้เจ้าของรถวัด SOH จริง — *รอรวบรวมจาก [[06 Reviews/International]]*
+- [Mini Cooper SE Battery Degradation Per Year — Recharged](https://recharged.com/articles/mini-cooper-se-battery-degradation-per-year)
+- [What is your battery state of health? — MINIF56 forum](https://www.minif56.com/threads/what-is-your-battery-state-of-health.98470/)
+- [OBD battery State of Health — MINI Electric Forum](https://www.minievforum.com/threads/obd-battery-state-of-health.1433/)
+- [How much have you seen your real range degrade — MINIF56 forum](https://www.minif56.com/threads/how-much-if-any-have-you-seen-your-real-range-degrade-over-time.95382/)
 
 ## Related Notes
 

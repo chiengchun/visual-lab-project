@@ -16,11 +16,15 @@ Cooper SE จัดเป็น EV ที่ปัญหาน้อยเมื
 | --- | --- | --- | --- | --- |
 | 1 | **Charging port lock actuator** | หัวชาร์จล็อคค้าง/ปลดไม่ออก หรือรถไม่ยอมเริ่มชาร์จ | เปลี่ยน actuator (ชิ้นส่วนไม่แพงมาก) | ⚠️ กลาง — น่ารำคาญ |
 | 2 | **แบต 12V เสื่อม** | ไฟเตือนมั่ว, ระบบรีบูต, ไม่ ready | เปลี่ยนแบต 12V → [[04 Ownership/12V Battery]] | 🟢 ต่ำ |
-| 3 | **Heat pump / ระบบแอร์** | แอร์ไม่เย็น/เสียงดัง/ระยะทางหด | ตรวจ-ซ่อมที่ศูนย์ อาจแพง | 🔴 สูงถ้าพัง — เช็คก่อนซื้อ |
+| 3 | **Heat pump / ระบบทำความร้อน–แอร์** | ในเมืองหนาว: ไม่มีความร้อน/heat หาย (บางคันซ้ำ ๆ ในปีแรก) จากตัว heater, auxiliary coolant pump หรือ control module · ในไทยประเด็นคือแอร์ต้องเย็นและกินไฟไม่ผิดปกติ | ตรวจ-ซ่อมที่ศูนย์ อาจแพง | 🔴 สูงถ้าพัง — เช็คก่อนซื้อ |
 | 4 | **ไอน้ำในไฟท้าย Union Jack** | ฝ้า/หยดน้ำในโคม | เคลม (ถ้ามีวอร์รันตี้) หรือเปลี่ยนโคม | 🟢 ต่ำ (ความงาม) |
 | 5 | **บั๊ก infotainment** | จอรีบูต, CarPlay หลุด, ค้าง | อัปเดตซอฟต์แวร์ → [[05 Problems/Known Bugs]] | 🟢 ต่ำ |
 | 6 | **KLE (on-board charger)** | ชาร์จ AC ไม่เข้า/ช้าผิดปกติ | เปลี่ยน/ซ่อม KLE — แพงถ้าหมดประกัน | 🔴 สูง — ทดสอบชาร์จ AC ก่อนซื้อเสมอ |
-| 7 | เสียงช่วงล่าง (บูช/ลิงก์) | กุกกักตามอายุ | งานช่วงล่างปกติของ F56 | 🟡 กลาง |
+| 7 | **Active grille shutters** | บานเกล็ดกระจังหน้าหลวม/มีเสียงจากด้านหน้า | เช็ค/ยึดใหม่ที่ศูนย์ | 🟢 ต่ำ |
+| 8 | เสียงช่วงล่าง (บูช/ลิงก์) | กุกกักตามอายุ | งานช่วงล่างปกติของ F56 | 🟡 กลาง |
+
+> [!info] Heat pump เป็นอุปกรณ์มาตรฐาน (ตอบ open question)
+> Cooper SE ติดตั้ง **heat pump เป็นมาตรฐานจากโรงงาน** — ดึงความร้อนเหลือทิ้งจากมอเตอร์/อิเล็กทรอนิกส์/แบต + อากาศภายนอก ใช้พลังงานน้อยกว่าฮีตเตอร์ไฟฟ้าปกติ ~75% รถไทยเป็น CBU Oxford ล็อตเดียวกันจึงมีเช่นกัน (ยืนยันรายคันได้จาก option list ผ่าน VIN → [[02 Buying Guide/VIN Decoder]]) · ในเมืองไทยประโยชน์หลักคือช่วยประสิทธิภาพแอร์/ระยะทาง มากกว่าการทำความร้อน
 
 ## นัยต่อการดูรถมือสอง
 
@@ -32,7 +36,11 @@ Cooper SE จัดเป็น EV ที่ปัญหาน้อยเมื
 
 ## References
 
-- รวบรวมจากชุมชนเจ้าของรถ (Reddit r/MiniCooperSE, ฟอรัม, กลุ่มไทย) — *ใส่ลิงก์เคสจริงเมื่อเก็บเข้า Inbox*
+- [Mini Cooper Electric Common Problems & Fixes — Recharged](https://recharged.com/articles/mini-cooper-electric-common-problems-and-fixes/)
+- [2023 Mini Cooper Electric Problems & Reliability — Recharged](https://recharged.com/articles/2023-mini-cooper-electric-problems)
+- [MINI EV common problems — MINI Electric Forum](https://www.minievforum.com/threads/mini-ev-common-problems.1440/)
+- [MINI Cooper SE technical details (heat pump มาตรฐาน) — BMWblog](https://www.bmwblog.com/2020/01/18/mini-cooper-se-technical-details-and-specifications/)
+- เพิ่มเติม: รวบรวมเคสไทยจากกลุ่ม Facebook/Pantip เมื่อเก็บเข้า Inbox
 
 ## Related Notes
 
@@ -40,7 +48,7 @@ Cooper SE จัดเป็น EV ที่ปัญหาน้อยเมื
 
 ## Questions
 
-- อาการไหนเกิดกับรถล็อตไทยบ่อยสุด (สภาพอากาศร้อนชื้น)?
+- อาการไหนเกิดกับรถล็อตไทยบ่อยสุด (สภาพอากาศร้อนชื้น — ปัญหา heat หายพบมากในเมืองหนาว อาจไม่ใช่ประเด็นไทย แต่ระบบ heat pump ตัวเดียวกันทำงานหนักกับแอร์แทน)?
 - ค่าเปลี่ยน charging port actuator ที่ศูนย์ไทยเท่าไร?
 
 ## Next Research
